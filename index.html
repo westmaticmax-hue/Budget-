@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budget App</title>
+    <title>Budget App - Hushållsekonomi</title>
     <style>
         * {
             margin: 0;
@@ -47,32 +47,132 @@
             gap: 16px;
         }
 
-        .app-icon {
+        .category-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 25px 15px;
+            padding: 20px 15px;
             text-align: center;
             text-decoration: none;
             color: #333;
             transition: all 0.3s ease;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
         }
 
-        .app-icon:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
         }
 
-        .icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
+        .category-icon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
         }
 
-        .label {
+        .category-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .category-desc {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .amount-display {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #2563eb;
+            background: rgba(37, 99, 235, 0.1);
+            padding: 4px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .number-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .number-btn {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.3rem;
             font-weight: 600;
-            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .number-btn:hover {
+            background: #e2e8f0;
+            transform: scale(1.05);
+        }
+
+        .number-btn.clear {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
+            grid-column: span 2;
+        }
+
+        .number-btn.ok {
+            background: #dcfce7;
+            border-color: #bbf7d0;
+            color: #16a34a;
+            font-weight: 700;
+        }
+
+        .amount-input {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
+            color: #2563eb;
+            border: none;
+            background: none;
+            width: 100%;
+            outline: none;
         }
 
         /* Mobile optimering */
@@ -81,12 +181,12 @@
                 gap: 12px;
             }
             
-            .app-icon {
-                padding: 20px 10px;
+            .category-card {
+                padding: 18px 10px;
             }
             
-            .icon {
-                font-size: 2rem;
+            .category-icon {
+                font-size: 1.8rem;
             }
         }
     </style>
@@ -95,41 +195,203 @@
     <div class="container">
         <div class="header">
             <h1>Budget</h1>
-            <p>Din ekonomi överblick</p>
+            <p>Hushållsekonomi</p>
         </div>
 
         <div class="grid">
-            <!-- 6 moderna app-ikoner -->
-            <a href="#" class="app-icon">
-                <div class="icon">💰</div>
-                <div class="label">Översikt</div>
-            </a>
+            <!-- 6 specifika kategorier -->
+            <div class="category-card" data-category="mat_familj">
+                <div class="category-icon">🍽️</div>
+                <div class="category-name">Mat Familj</div>
+                <div class="category-desc">Daglig mat för hela familjen</div>
+                <div class="amount-display">0 kr</div>
+            </div>
 
-            <a href="#" class="app-icon">
-                <div class="icon">📊</div>
-                <div class="label">Statistik</div>
-            </a>
+            <div class="category-card" data-category="mat_personligt">
+                <div class="category-icon">🍎</div>
+                <div class="category-name">Mat Personligt</div>
+                <div class="category-desc">Lunch, fika, ute-ätande</div>
+                <div class="amount-display">0 kr</div>
+            </div>
 
-            <a href="#" class="app-icon">
-                <div class="icon">🎯</div>
-                <div class="label">Mål</div>
-            </a>
+            <div class="category-card" data-category="saker_personligt">
+                <div class="category-icon">👕</div>
+                <div class="category-name">Saker Personligt</div>
+                <div class="category-desc">Kläder, skor, accessoarer</div>
+                <div class="amount-display">0 kr</div>
+            </div>
 
-            <a href="#" class="app-icon">
-                <div class="icon">📈</div>
-                <div class="label">Investeringar</div>
-            </a>
+            <div class="category-card" data-category="bil_drivmedel">
+                <div class="category-icon">🚗</div>
+                <div class="category-name">Bil & Drivmedel</div>
+                <div class="category-desc">Bensin, underhåll, försäkring</div>
+                <div class="amount-display">0 kr</div>
+            </div>
 
-            <a href="#" class="app-icon">
-                <div class="icon">🔔</div>
-                <div class="label">Påminnelser</div>
-            </a>
+            <div class="category-card" data-category="grejer_hemma">
+                <div class="category-icon">🏠</div>
+                <div class="category-name">Grejer Hemma</div>
+                <div class="category-desc">Möbler, inredning, prylar</div>
+                <div class="amount-display">0 kr</div>
+            </div>
 
-            <a href="#" class="app-icon">
-                <div class="icon">⚙️</div>
-                <div class="label">Inställningar</div>
-            </a>
+            <div class="category-card" data-category="noje_fritid">
+                <div class="category-icon">🎊</div>
+                <div class="category-name">Nöje & Fritid</div>
+                <div class="category-desc">Restaurang, bio, aktiviteter</div>
+                <div class="amount-display">0 kr</div>
+            </div>
         </div>
     </div>
+
+    <!-- Input Modal -->
+    <div class="modal" id="inputModal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">Ange belopp</div>
+            <input type="text" class="amount-input" id="amountInput" value="0" readonly>
+            <div class="number-pad">
+                <button class="number-btn" data-number="1">1</button>
+                <button class="number-btn" data-number="2">2</button>
+                <button class="number-btn" data-number="3">3</button>
+                <button class="number-btn" data-number="4">4</button>
+                <button class="number-btn" data-number="5">5</button>
+                <button class="number-btn" data-number="6">6</button>
+                <button class="number-btn" data-number="7">7</button>
+                <button class="number-btn" data-number="8">8</button>
+                <button class="number-btn" data-number="9">9</button>
+                <button class="number-btn" data-number="0">0</button>
+                <button class="number-btn clear" id="clearBtn">Rensa</button>
+                <button class="number-btn ok" id="okBtn">Klar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variabler för aktuell kategori och belopp
+        let currentCategory = '';
+        let currentAmount = '0';
+
+        // Hämta element
+        const modal = document.getElementById('inputModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const amountInput = document.getElementById('amountInput');
+        const clearBtn = document.getElementById('clearBtn');
+        const okBtn = document.getElementById('okBtn');
+
+        // Visa modal när kategori klickas
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', function() {
+                currentCategory = this.dataset.category;
+                const categoryName = this.querySelector('.category-name').textContent;
+                
+                modalTitle.textContent = `Belopp för ${categoryName}`;
+                currentAmount = '0';
+                amountInput.value = currentAmount;
+                modal.style.display = 'flex';
+            });
+        });
+
+        // Numerisk knappsats
+        document.querySelectorAll('.number-btn[data-number]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const number = this.dataset.number;
+                
+                if (currentAmount === '0') {
+                    currentAmount = number;
+                } else {
+                    currentAmount += number;
+                }
+                
+                amountInput.value = currentAmount;
+            });
+        });
+
+        // Rensa knapp
+        clearBtn.addEventListener('click', function() {
+            currentAmount = '0';
+            amountInput.value = currentAmount;
+        });
+
+        // OK knapp - spara till Google Sheets
+        okBtn.addEventListener('click', function() {
+            const amount = parseInt(currentAmount);
+            
+            if (amount > 0) {
+                // Uppdatera visning på knappen
+                const card = document.querySelector(`[data-category="${currentCategory}"]`);
+                card.querySelector('.amount-display').textContent = `${amount} kr`;
+                
+                // Skicka till Google Sheets
+                saveToGoogleSheets(currentCategory, amount);
+                
+                // Stäng modal
+                modal.style.display = 'none';
+            }
+        });
+
+        // Stäng modal vid klick utanför
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Funktion för att spara till Google Sheets
+        async function saveToGoogleSheets(category, amount) {
+            const GOOGLE_SCRIPT_URL = 'DIN_GOOGLE_APPS_SCRIPT_URL_HÄR';
+            
+            const data = {
+                category: category,
+                amount: amount,
+                date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+                timestamp: new Date().toLocaleString('sv-SE')
+            };
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    console.log('Data sparad till Google Sheets');
+                } else {
+                    console.error('Kunde inte spara till Sheets');
+                    // Fallback: spara lokalt
+                    saveToLocalStorage(data);
+                }
+            } catch (error) {
+                console.error('Nätverksfel:', error);
+                // Fallback: spara lokalt
+                saveToLocalStorage(data);
+            }
+        }
+
+        // Fallback: Spara till localStorage
+        function saveToLocalStorage(data) {
+            const savedData = JSON.parse(localStorage.getItem('budgetData') || '[]');
+            savedData.push(data);
+            localStorage.setItem('budgetData', JSON.stringify(savedData));
+            console.log('Data sparad lokalt:', data);
+        }
+
+        // Ladda sparade data vid start
+        function loadSavedData() {
+            const savedData = JSON.parse(localStorage.getItem('budgetData') || '[]');
+            
+            savedData.forEach(entry => {
+                const card = document.querySelector(`[data-category="${entry.category}"]`);
+                if (card) {
+                    card.querySelector('.amount-display').textContent = `${entry.amount} kr`;
+                }
+            });
+        }
+
+        // Ladda data när sidan startar
+        loadSavedData();
+    </script>
 </body>
 </html>
