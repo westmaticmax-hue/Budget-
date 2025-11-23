@@ -43,7 +43,7 @@
             opacity: 0.9;
         }
 
-        /* Total ruta - högst upp till höger */
+        /* Total ruta - delad på höjden */
         .total-box {
             position: absolute;
             top: 20px;
@@ -51,24 +51,41 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 15px;
-            padding: 15px;
+            padding: 0;
             text-align: center;
-            min-width: 120px;
+            min-width: 140px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .total-section {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .total-section:last-child {
+            border-bottom: none;
         }
 
         .total-label {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: #666;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
+            text-transform: uppercase;
         }
 
         .total-amount {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #2563eb;
+        }
+
+        .start-date {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #666;
         }
 
         .grid {
@@ -263,12 +280,18 @@
     <div class="container">
         <div class="header">
             <h1>Budget</h1>
-            <p>Rörliga utgifter sammanslagna</p>
+            <p>Hushållsekonomi</p>
             
-            <!-- Total ruta - högst upp till höger -->
+            <!-- Total ruta - delad på höjden -->
             <div class="total-box">
-                <div class="total-label">TOTAL</div>
-                <div class="total-amount" id="totalAmount">0 kr</div>
+                <div class="total-section">
+                    <div class="total-label">Total</div>
+                    <div class="total-amount" id="totalAmount">0 kr</div>
+                </div>
+                <div class="total-section">
+                    <div class="total-label">Startdatum</div>
+                    <div class="start-date" id="startDate">Idag</div>
+                </div>
             </div>
         </div>
 
@@ -282,44 +305,44 @@
             </div>
 
             <div class="category-card" data-category="mat_personligt">
-                <div class="category-icon">🍕</div>
+                <div class="category-icon">🍎</div>
                 <div class="category-name">Mat Personligt</div>
-                <div class="category-desc">Lunch, fika, ute-ätande mm</div>
+                <div class="category-desc">Lunch, fika, ute-ätande</div>
                 <div class="amount-display">0 kr</div>
             </div>
 
             <div class="category-card" data-category="saker_familj">
                 <div class="category-icon">👨‍👩‍👧‍👦</div>
-                <div class="category-name">Saker Barn</div>
-                <div class="category-desc">Saker till barn, skor, kläder, saker, skola</div>
+                <div class="category-name">Saker Familj</div>
+                <div class="category-desc">Gemensamma inköp för familjen</div>
                 <div class="amount-display">0 kr</div>
             </div>
 
             <div class="category-card" data-category="saker_personligt">
                 <div class="category-icon">👕</div>
                 <div class="category-name">Saker Personligt</div>
-                <div class="category-desc">Kläder, skor, accessoarer</div>
+                <div class="category-desc">Kläder, sko, accessoarer</div>
                 <div class="amount-display">0 kr</div>
             </div>
 
             <div class="category-card" data-category="grejer_hemma">
                 <div class="category-icon">🏠</div>
                 <div class="category-name">Grejer Hemma</div>
-                <div class="category-desc">Möbler, inredning, prylar, schampoo, tvätt</div>
+                <div class="category-desc">Möbler, inredning, prylar</div>
                 <div class="amount-display">0 kr</div>
             </div>
 
             <div class="category-card" data-category="bil_drivmedel">
                 <div class="category-icon">🚗</div>
                 <div class="category-name">Bil & Drivmedel</div>
-                <div class="category-desc">Bensin, underhåll, förbruknigsmaterial</div>
+                <div class="category-desc">Bensin, underhåll, försäkring</div>
                 <div class="amount-display">0 kr</div>
             </div>
         </div>
     </div>
 
     <!-- Nollställningsknapp - längst ner till höger -->
-    <div class="reset-btn" id="resetBtn" title="Nollställ total">
+    <div class="reset-btn" id="resetBtn" title="Starta ny räkneperiod">
         0
     </div>
 
@@ -350,6 +373,7 @@
         let currentCategory = '';
         let currentAmount = '0';
         let totalAmount = 0;
+        let periodStartDate = new Date();
 
         // Hämta element
         const modal = document.getElementById('inputModal');
@@ -358,25 +382,84 @@
         const clearBtn = document.getElementById('clearBtn');
         const okBtn = document.getElementById('okBtn');
         const totalAmountDisplay = document.getElementById('totalAmount');
+        const startDateDisplay = document.getElementById('startDate');
         const resetBtn = document.getElementById('resetBtn');
+
+        // Formatera datum till svensk format
+        function formatDate(date) {
+            return date.toLocaleDateString('sv-SE', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
 
         // Uppdatera total display
         function updateTotalDisplay() {
             totalAmountDisplay.textContent = `${totalAmount} kr`;
         }
 
-        // Ladda sparad total från localStorage
-        function loadTotalFromStorage() {
+        // Uppdatera startdatum display
+        function updateStartDateDisplay() {
+            startDateDisplay.textContent = formatDate(periodStartDate);
+        }
+
+        // Räkna ut antal dagar sedan start
+        function getDaysSinceStart() {
+            const today = new Date();
+            const diffTime = today - periodStartDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        // Ladda sparad data från localStorage
+        function loadFromStorage() {
             const savedTotal = localStorage.getItem('budgetTotal');
+            const savedStartDate = localStorage.getItem('budgetStartDate');
+            
             if (savedTotal) {
                 totalAmount = parseInt(savedTotal);
                 updateTotalDisplay();
             }
+            
+            if (savedStartDate) {
+                periodStartDate = new Date(savedStartDate);
+                updateStartDateDisplay();
+                
+                // Visa antal dagar i konsolen för debugging
+                console.log(`Räkneperiod: ${getDaysSinceStart()} dagar`);
+            } else {
+                // Första gången - sätt dagens datum
+                periodStartDate = new Date();
+                updateStartDateDisplay();
+                saveToStorage();
+            }
         }
 
-        // Spara total till localStorage
-        function saveTotalToStorage() {
+        // Spara data till localStorage
+        function saveToStorage() {
             localStorage.setItem('budgetTotal', totalAmount.toString());
+            localStorage.setItem('budgetStartDate', periodStartDate.toISOString());
+        }
+
+        // Starta ny räkneperiod
+        function startNewPeriod() {
+            totalAmount = 0;
+            periodStartDate = new Date();
+            
+            updateTotalDisplay();
+            updateStartDateDisplay();
+            saveToStorage();
+            
+            // Nollställ alla kategori-belopp
+            document.querySelectorAll('.amount-display').forEach(display => {
+                display.textContent = '0 kr';
+            });
+            
+            // Rensa localStorage för kategori-data
+            localStorage.removeItem('budgetData');
+            
+            console.log('Ny räkneperiod startad:', formatDate(periodStartDate));
         }
 
         // Visa modal när kategori klickas
@@ -425,7 +508,7 @@
                 // Uppdatera total summa
                 totalAmount += amount;
                 updateTotalDisplay();
-                saveTotalToStorage();
+                saveToStorage();
                 
                 // Skicka till Google Sheets
                 saveToGoogleSheets(currentCategory, amount);
@@ -435,20 +518,11 @@
             }
         });
 
-        // Nollställningsknapp
+        // Nollställningsknapp - startar ny räkneperiod
         resetBtn.addEventListener('click', function() {
-            if (confirm('Vill du nollställa total summan till 0?')) {
-                totalAmount = 0;
-                updateTotalDisplay();
-                saveTotalToStorage();
-                
-                // Nollställ även alla kategori-belopp
-                document.querySelectorAll('.amount-display').forEach(display => {
-                    display.textContent = '0 kr';
-                });
-                
-                // Rensa localStorage för kategori-data
-                localStorage.removeItem('budgetData');
+            const days = getDaysSinceStart();
+            if (confirm(`Vill du starta en ny räkneperiod?\n\nNuvarande period: ${formatDate(periodStartDate)}\nLöpande: ${totalAmount} kr\nPeriod: ${days} dagar`)) {
+                startNewPeriod();
             }
         });
 
@@ -467,7 +541,9 @@
                 category: category,
                 amount: amount,
                 date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
-                timestamp: new Date().toLocaleString('sv-SE')
+                timestamp: new Date().toLocaleString('sv-SE'),
+                period_start: periodStartDate.toISOString().split('T')[0],
+                days_in_period: getDaysSinceStart()
             };
             
             try {
@@ -489,7 +565,7 @@
             } catch (error) {
                 console.error('Nätverksfel:', error);
                 // Fallback: spara lokalt
-                saveToLocalStorage(data);
+                    saveToLocalStorage(data);
             }
         }
 
@@ -501,21 +577,31 @@
             console.log('Data sparad lokalt:', data);
         }
 
-        // Ladda sparade data vid start
-        function loadSavedData() {
+        // Ladda sparade kategori-data vid start
+        function loadSavedCategoryData() {
             const savedData = JSON.parse(localStorage.getItem('budgetData') || '[]');
             
+            // Beräkna total från sparad kategori-data
+            let calculatedTotal = 0;
             savedData.forEach(entry => {
                 const card = document.querySelector(`[data-category="${entry.category}"]`);
                 if (card) {
                     card.querySelector('.amount-display').textContent = `${entry.amount} kr`;
+                    calculatedTotal += entry.amount;
                 }
             });
+            
+            // Uppdatera total om den inte stämmer
+            if (calculatedTotal !== totalAmount) {
+                totalAmount = calculatedTotal;
+                updateTotalDisplay();
+                saveToStorage();
+            }
         }
 
         // Initiera appen
-        loadTotalFromStorage();
-        loadSavedData();
+        loadFromStorage();
+        loadSavedCategoryData();
     </script>
 </body>
 </html>
