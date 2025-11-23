@@ -107,11 +107,35 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
+            position: relative;
         }
 
         .category-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Anteckningsblocks-ikon */
+        .history-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .history-btn:hover {
+            background: rgba(37, 99, 235, 0.2);
+            transform: scale(1.1);
         }
 
         .category-icon {
@@ -140,6 +164,15 @@
             padding: 4px 8px;
             border-radius: 10px;
             margin-top: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 20px;
+            padding: 10px;
         }
 
         /* Nollställningsknapp - längst ner till höger */
@@ -194,6 +227,81 @@
             max-width: 320px;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Historik-modal - större */
+        .history-modal .modal-content {
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .history-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .history-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 5px;
+        }
+
+        .history-period {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-date {
+            font-size: 0.8rem;
+            color: #666;
+            min-width: 80px;
+        }
+
+        .history-amount {
+            font-weight: 700;
+            color: #2563eb;
+            font-size: 1.1rem;
+        }
+
+        .history-total {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+
+        .history-total-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .history-total-amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2563eb;
         }
 
         .modal-title {
@@ -273,6 +381,10 @@
                 margin: 0 auto 20px auto;
                 max-width: 200px;
             }
+            
+            .history-modal .modal-content {
+                max-width: 350px;
+            }
         }
     </style>
 </head>
@@ -296,8 +408,9 @@
         </div>
 
         <div class="grid">
-            <!-- Placering enligt din beskrivning -->
+            <!-- Kategorier med historik-knappar -->
             <div class="category-card" data-category="mat_familj">
+                <div class="history-btn" data-category="mat_familj">📝</div>
                 <div class="category-icon">🍽️</div>
                 <div class="category-name">Mat Familj</div>
                 <div class="category-desc">Daglig mat för hela familjen</div>
@@ -305,6 +418,7 @@
             </div>
 
             <div class="category-card" data-category="mat_personligt">
+                <div class="history-btn" data-category="mat_personligt">📝</div>
                 <div class="category-icon">🍎</div>
                 <div class="category-name">Mat Personligt</div>
                 <div class="category-desc">Lunch, fika, ute-ätande, mm</div>
@@ -312,6 +426,7 @@
             </div>
 
             <div class="category-card" data-category="saker_familj">
+                <div class="history-btn" data-category="saker_familj">📝</div>
                 <div class="category-icon">👨‍👩‍👧‍👦</div>
                 <div class="category-name">Saker Barn</div>
                 <div class="category-desc">Gemensamma inköp för barn/familjen</div>
@@ -319,6 +434,7 @@
             </div>
 
             <div class="category-card" data-category="saker_personligt">
+                <div class="history-btn" data-category="saker_personligt">📝</div>
                 <div class="category-icon">👕</div>
                 <div class="category-name">Saker Personligt</div>
                 <div class="category-desc">Kläder, skor, accessoarer, mm</div>
@@ -326,6 +442,7 @@
             </div>
 
             <div class="category-card" data-category="grejer_hemma">
+                <div class="history-btn" data-category="grejer_hemma">📝</div>
                 <div class="category-icon">🏠</div>
                 <div class="category-name">Grejer Hemma</div>
                 <div class="category-desc">Möbler, inredning, prylar, tvål, tvätt mm</div>
@@ -333,6 +450,7 @@
             </div>
 
             <div class="category-card" data-category="bil_drivmedel">
+                <div class="history-btn" data-category="bil_drivmedel">📝</div>
                 <div class="category-icon">🚗</div>
                 <div class="category-name">Bil & Drivmedel</div>
                 <div class="category-desc">Bensin, underhåll, försäkring</div>
@@ -341,9 +459,8 @@
         </div>
         
         <div class="footer">
-  Koll på slanten &copy; Max 2025
-</div>
-
+            Koll på slanten &copy; Max 2025
+        </div>
     </div>
 
     <!-- Nollställningsknapp - längst ner till höger -->
@@ -373,6 +490,25 @@
         </div>
     </div>
 
+    <!-- Historik Modal -->
+    <div class="modal history-modal" id="historyModal">
+        <div class="modal-content">
+            <div class="history-header">
+                <div class="history-title" id="historyTitle">Historik</div>
+                <div class="history-period" id="historyPeriod">Period</div>
+            </div>
+            
+            <div class="history-list" id="historyList">
+                <!-- Historik listan kommer här -->
+            </div>
+            
+            <div class="history-total">
+                <div class="history-total-label">Totalt denna period</div>
+                <div class="history-total-amount" id="historyTotalAmount">0 kr</div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Variabler för aktuell kategori och belopp
         let currentCategory = '';
@@ -382,6 +518,7 @@
 
         // Hämta element
         const modal = document.getElementById('inputModal');
+        const historyModal = document.getElementById('historyModal');
         const modalTitle = document.getElementById('modalTitle');
         const amountInput = document.getElementById('amountInput');
         const clearBtn = document.getElementById('clearBtn');
@@ -389,11 +526,25 @@
         const totalAmountDisplay = document.getElementById('totalAmount');
         const startDateDisplay = document.getElementById('startDate');
         const resetBtn = document.getElementById('resetBtn');
+        const historyTitle = document.getElementById('historyTitle');
+        const historyPeriod = document.getElementById('historyPeriod');
+        const historyList = document.getElementById('historyList');
+        const historyTotalAmount = document.getElementById('historyTotalAmount');
 
         // Formatera datum till svensk format
         function formatDate(date) {
             return date.toLocaleDateString('sv-SE', {
                 year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Formatera datum för visning i historik
+        function formatDateForHistory(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('sv-SE', {
+                weekday: 'short',
                 month: 'short',
                 day: 'numeric'
             });
@@ -417,6 +568,48 @@
             return diffDays;
         }
 
+        // Visa historik för kategori
+        function showCategoryHistory(category) {
+            const categoryData = getCategoryHistory(category);
+            const categoryName = document.querySelector(`[data-category="${category}"] .category-name`).textContent;
+            
+            historyTitle.textContent = `Historik - ${categoryName}`;
+            historyPeriod.textContent = `Period: ${formatDate(periodStartDate)} - Idag (${getDaysSinceStart()} dagar)`;
+            
+            // Rensa historik-listan
+            historyList.innerHTML = '';
+            
+            let categoryTotal = 0;
+            
+            if (categoryData.length === 0) {
+                historyList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Inga transaktioner denna period</div>';
+            } else {
+                categoryData.forEach(entry => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-date">${formatDateForHistory(entry.date)}</div>
+                        <div class="history-amount">${entry.amount} kr</div>
+                    `;
+                    historyList.appendChild(historyItem);
+                    categoryTotal += entry.amount;
+                });
+            }
+            
+            historyTotalAmount.textContent = `${categoryTotal} kr`;
+            historyModal.style.display = 'flex';
+        }
+
+        // Hämta historik för specifik kategori
+        function getCategoryHistory(category) {
+            const savedData = JSON.parse(localStorage.getItem('budgetData') || '[]');
+            const periodStart = periodStartDate.toISOString().split('T')[0];
+            
+            return savedData
+                .filter(entry => entry.category === category && entry.date >= periodStart)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
         // Ladda sparad data från localStorage
         function loadFromStorage() {
             const savedTotal = localStorage.getItem('budgetTotal');
@@ -430,11 +623,7 @@
             if (savedStartDate) {
                 periodStartDate = new Date(savedStartDate);
                 updateStartDateDisplay();
-                
-                // Visa antal dagar i konsolen för debugging
-                console.log(`Räkneperiod: ${getDaysSinceStart()} dagar`);
             } else {
-                // Första gången - sätt dagens datum
                 periodStartDate = new Date();
                 updateStartDateDisplay();
                 saveToStorage();
@@ -456,16 +645,21 @@
             updateStartDateDisplay();
             saveToStorage();
             
-            // Nollställ alla kategori-belopp
             document.querySelectorAll('.amount-display').forEach(display => {
                 display.textContent = '0 kr';
             });
             
-            // Rensa localStorage för kategori-data
             localStorage.removeItem('budgetData');
-            
-            console.log('Ny räkneperiod startad:', formatDate(periodStartDate));
         }
+
+        // Event Listeners för historik-knappar
+        document.querySelectorAll('.history-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation(); // Förhindra att kategori-kortet triggas
+                const category = this.dataset.category;
+                showCategoryHistory(category);
+            });
+        });
 
         // Visa modal när kategori klickas
         document.querySelectorAll('.category-card').forEach(card => {
@@ -506,19 +700,14 @@
             const amount = parseInt(currentAmount);
             
             if (amount > 0) {
-                // Uppdatera visning på knappen
                 const card = document.querySelector(`[data-category="${currentCategory}"]`);
                 card.querySelector('.amount-display').textContent = `${amount} kr`;
                 
-                // Uppdatera total summa
                 totalAmount += amount;
                 updateTotalDisplay();
                 saveToStorage();
                 
-                // Skicka till Google Sheets
                 saveToGoogleSheets(currentCategory, amount);
-                
-                // Stäng modal
                 modal.style.display = 'none';
             }
         });
@@ -532,10 +721,12 @@
         });
 
         // Stäng modal vid klick utanför
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
+        [modal, historyModal].forEach(modalElement => {
+            modalElement.addEventListener('click', function(e) {
+                if (e.target === modalElement) {
+                    modalElement.style.display = 'none';
+                }
+            });
         });
 
         // Funktion för att spara till Google Sheets
@@ -545,7 +736,7 @@
             const data = {
                 category: category,
                 amount: amount,
-                date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+                date: new Date().toISOString().split('T')[0],
                 timestamp: new Date().toLocaleString('sv-SE'),
                 period_start: periodStartDate.toISOString().split('T')[0],
                 days_in_period: getDaysSinceStart()
@@ -563,14 +754,10 @@
                 if (response.ok) {
                     console.log('Data sparad till Google Sheets');
                 } else {
-                    console.error('Kunde inte spara till Sheets');
-                    // Fallback: spara lokalt
                     saveToLocalStorage(data);
                 }
             } catch (error) {
-                console.error('Nätverksfel:', error);
-                // Fallback: spara lokalt
-                    saveToLocalStorage(data);
+                saveToLocalStorage(data);
             }
         }
 
@@ -579,14 +766,12 @@
             const savedData = JSON.parse(localStorage.getItem('budgetData') || '[]');
             savedData.push(data);
             localStorage.setItem('budgetData', JSON.stringify(savedData));
-            console.log('Data sparad lokalt:', data);
         }
 
         // Ladda sparade kategori-data vid start
         function loadSavedCategoryData() {
             const savedData = JSON.parse(localStorage.getItem('budgetData') || '[]');
             
-            // Beräkna total från sparad kategori-data
             let calculatedTotal = 0;
             savedData.forEach(entry => {
                 const card = document.querySelector(`[data-category="${entry.category}"]`);
@@ -596,7 +781,6 @@
                 }
             });
             
-            // Uppdatera total om den inte stämmer
             if (calculatedTotal !== totalAmount) {
                 totalAmount = calculatedTotal;
                 updateTotalDisplay();
