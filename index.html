@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            position: relative;
         }
 
         .container {
@@ -28,6 +29,7 @@
             color: white;
             margin-bottom: 40px;
             padding-top: 20px;
+            position: relative;
         }
 
         .header h1 {
@@ -41,10 +43,39 @@
             opacity: 0.9;
         }
 
+        /* Total ruta - högst upp till höger */
+        .total-box {
+            position: absolute;
+            top: 20px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            min-width: 120px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .total-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .total-amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
+            margin-bottom: 60px;
         }
 
         .category-card {
@@ -92,6 +123,35 @@
             padding: 4px 8px;
             border-radius: 10px;
             margin-top: 5px;
+        }
+
+        /* Nollställningsknapp - längst ner till höger */
+        .reset-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(220, 38, 38, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .reset-btn:hover {
+            transform: scale(1.1);
+            background: rgba(220, 38, 38, 1);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
         }
 
         /* Modal styles */
@@ -188,6 +248,14 @@
             .category-icon {
                 font-size: 1.8rem;
             }
+            
+            .total-box {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 0 auto 20px auto;
+                max-width: 200px;
+            }
         }
     </style>
 </head>
@@ -196,10 +264,16 @@
         <div class="header">
             <h1>Budget</h1>
             <p>Hushållsekonomi</p>
+            
+            <!-- Total ruta - högst upp till höger -->
+            <div class="total-box">
+                <div class="total-label">TOTAL</div>
+                <div class="total-amount" id="totalAmount">0 kr</div>
+            </div>
         </div>
 
         <div class="grid">
-            <!-- 6 specifika kategorier -->
+            <!-- Placering enligt din beskrivning -->
             <div class="category-card" data-category="mat_familj">
                 <div class="category-icon">🍽️</div>
                 <div class="category-name">Mat Familj</div>
@@ -214,17 +288,17 @@
                 <div class="amount-display">0 kr</div>
             </div>
 
+            <div class="category-card" data-category="saker_familj">
+                <div class="category-icon">👨‍👩‍👧‍👦</div>
+                <div class="category-name">Saker Familj</div>
+                <div class="category-desc">Gemensamma inköp för familjen</div>
+                <div class="amount-display">0 kr</div>
+            </div>
+
             <div class="category-card" data-category="saker_personligt">
                 <div class="category-icon">👕</div>
                 <div class="category-name">Saker Personligt</div>
                 <div class="category-desc">Kläder, skor, accessoarer</div>
-                <div class="amount-display">0 kr</div>
-            </div>
-
-            <div class="category-card" data-category="bil_drivmedel">
-                <div class="category-icon">🚗</div>
-                <div class="category-name">Bil & Drivmedel</div>
-                <div class="category-desc">Bensin, underhåll, försäkring</div>
                 <div class="amount-display">0 kr</div>
             </div>
 
@@ -235,13 +309,18 @@
                 <div class="amount-display">0 kr</div>
             </div>
 
-            <div class="category-card" data-category="noje_fritid">
-                <div class="category-icon">🎊</div>
-                <div class="category-name">Nöje & Fritid</div>
-                <div class="category-desc">Restaurang, bio, aktiviteter</div>
+            <div class="category-card" data-category="bil_drivmedel">
+                <div class="category-icon">🚗</div>
+                <div class="category-name">Bil & Drivmedel</div>
+                <div class="category-desc">Bensin, underhåll, försäkring</div>
                 <div class="amount-display">0 kr</div>
             </div>
         </div>
+    </div>
+
+    <!-- Nollställningsknapp - längst ner till höger -->
+    <div class="reset-btn" id="resetBtn" title="Nollställ total">
+        0
     </div>
 
     <!-- Input Modal -->
@@ -270,6 +349,7 @@
         // Variabler för aktuell kategori och belopp
         let currentCategory = '';
         let currentAmount = '0';
+        let totalAmount = 0;
 
         // Hämta element
         const modal = document.getElementById('inputModal');
@@ -277,6 +357,27 @@
         const amountInput = document.getElementById('amountInput');
         const clearBtn = document.getElementById('clearBtn');
         const okBtn = document.getElementById('okBtn');
+        const totalAmountDisplay = document.getElementById('totalAmount');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Uppdatera total display
+        function updateTotalDisplay() {
+            totalAmountDisplay.textContent = `${totalAmount} kr`;
+        }
+
+        // Ladda sparad total från localStorage
+        function loadTotalFromStorage() {
+            const savedTotal = localStorage.getItem('budgetTotal');
+            if (savedTotal) {
+                totalAmount = parseInt(savedTotal);
+                updateTotalDisplay();
+            }
+        }
+
+        // Spara total till localStorage
+        function saveTotalToStorage() {
+            localStorage.setItem('budgetTotal', totalAmount.toString());
+        }
 
         // Visa modal när kategori klickas
         document.querySelectorAll('.category-card').forEach(card => {
@@ -312,7 +413,7 @@
             amountInput.value = currentAmount;
         });
 
-        // OK knapp - spara till Google Sheets
+        // OK knapp - spara till Google Sheets och uppdatera total
         okBtn.addEventListener('click', function() {
             const amount = parseInt(currentAmount);
             
@@ -321,11 +422,33 @@
                 const card = document.querySelector(`[data-category="${currentCategory}"]`);
                 card.querySelector('.amount-display').textContent = `${amount} kr`;
                 
+                // Uppdatera total summa
+                totalAmount += amount;
+                updateTotalDisplay();
+                saveTotalToStorage();
+                
                 // Skicka till Google Sheets
                 saveToGoogleSheets(currentCategory, amount);
                 
                 // Stäng modal
                 modal.style.display = 'none';
+            }
+        });
+
+        // Nollställningsknapp
+        resetBtn.addEventListener('click', function() {
+            if (confirm('Vill du nollställa total summan till 0?')) {
+                totalAmount = 0;
+                updateTotalDisplay();
+                saveTotalToStorage();
+                
+                // Nollställ även alla kategori-belopp
+                document.querySelectorAll('.amount-display').forEach(display => {
+                    display.textContent = '0 kr';
+                });
+                
+                // Rensa localStorage för kategori-data
+                localStorage.removeItem('budgetData');
             }
         });
 
@@ -390,7 +513,8 @@
             });
         }
 
-        // Ladda data när sidan startar
+        // Initiera appen
+        loadTotalFromStorage();
         loadSavedData();
     </script>
 </body>
