@@ -1,1 +1,316 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget - Hushållsekonomi</title>
+    <meta name="theme-color" content="#2563eb">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .budget-button {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .budget-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .budget-button:active {
+            transform: translateY(0);
+        }
+
+        .button-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .button-content {
+            flex: 1;
+        }
+
+        .button-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .button-subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Färger för knapparna */
+        .button-food-family .button-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .button-food-private .button-icon {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .button-car .button-icon {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .button-kids .button-icon {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .button-home .button-icon {
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            color: white;
+        }
+
+        .button-misc .button-icon {
+            background: linear-gradient(135deg, #64748b, #475569);
+            color: white;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .summary-amount {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .total {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+            
+            .budget-button {
+                padding: 16px;
+            }
+            
+            .button-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+            
+            .button-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Budget</h1>
+            <p>Hushållsekonomi överblick</p>
+        </div>
+
+        <div class="buttons-grid">
+            <!-- Mat familj -->
+            <a href="#" class="budget-button button-food-family">
+                <div class="button-icon">🍽️</div>
+                <div class="button-content">
+                    <div class="button-title">Mat familj</div>
+                    <div class="button-subtitle">Daglig mat för hela familjen</div>
+                </div>
+            </a>
+
+            <!-- Mat privat -->
+            <a href="#" class="budget-button button-food-private">
+                <div class="button-icon">☕</div>
+                <div class="button-content">
+                    <div class="button-title">Mat privat</div>
+                    <div class="button-subtitle">Lunch ute, fika och restaurang</div>
+                </div>
+            </a>
+
+            <!-- Bil / Bensin -->
+            <a href="#" class="budget-button button-car">
+                <div class="button-icon">🚗</div>
+                <div class="button-content">
+                    <div class="button-title">Bil / Bensin</div>
+                    <div class="button-subtitle">Bränsle, underhåll och försäkring</div>
+                </div>
+            </a>
+
+            <!-- Utgift barn -->
+            <a href="#" class="budget-button button-kids">
+                <div class="button-icon">👶</div>
+                <div class="button-content">
+                    <div class="button-title">Utgift barn</div>
+                    <div class="button-subtitle">Kläder, aktiviteter och leksaker</div>
+                </div>
+            </a>
+
+            <!-- Hem inköp -->
+            <a href="#" class="budget-button button-home">
+                <div class="button-icon">🏠</div>
+                <div class="button-content">
+                    <div class="button-title">Hem inköp</div>
+                    <div class="button-subtitle">Möbler, inredning och hemförbättring</div>
+                </div>
+            </a>
+
+            <!-- Diverse -->
+            <a href="#" class="budget-button button-misc">
+                <div class="button-icon">📦</div>
+                <div class="button-content">
+                    <div class="button-title">Diverse</div>
+                    <div class="button-subtitle">Övriga utgifter och nöjen</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-title">Månatlig sammanställning</div>
+            <div class="summary-item">
+                <span class="summary-label">Totalt spenderat</span>
+                <span class="summary-amount">4 850 kr</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Budget kvar</span>
+                <span class="summary-amount">2 150 kr</span>
+            </div>
+            <div class="summary-item total">
+                <span class="summary-label">Månadsbudget</span>
+                <span class="summary-amount">7 000 kr</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enkel JavaScript för knappinteraktion
+        document.querySelectorAll('.budget-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const category = this.querySelector('.button-title').textContent;
+                alert(`Öppnar registrering för: ${category}`);
+                // Här kan du lägga till funktionalitet för att öppna formulär etc.
+            });
+        });
+
+        // Exempel på att uppdatera sammanställning
+        function updateSummary() {
+            // Här kan du lägga till kod för att uppdatera siffrorna
+            // baserat på sparad data
+        }
+    </script>
+</body>
+</html>
